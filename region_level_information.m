@@ -1,7 +1,6 @@
 function region_level = region_level_information(f, l, S, g, sigma)
 % Function for region-level information calculation
 % Inputs:
-% flag - GPU check. Flag = 1 if GPU is existed.
 % f - Input image
 % l - Side length of block
 % S - Side length of region
