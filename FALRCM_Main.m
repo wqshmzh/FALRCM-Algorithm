@@ -78,7 +78,7 @@ for i = -1 : 1
 end
 min_xi = min(min(min(xi)));
 max_xi = max(max(max(xi)));
-xi =(xi - min_xi)./(max_xi-min_xi); % Eq. (15)
+xi = (xi - min_xi) ./ (max_xi - min_xi); % Eq. (15)
 xi = repmat(reshape(xi, n, 1, depth), [1 cluster_num 1]);
 %% Calculate Eq. (21)
 difference = k * exp(stdfilt(f, ones(3)) - stdfilt(f_region_information, ones(3))) + eps;
