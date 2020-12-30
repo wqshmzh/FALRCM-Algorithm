@@ -64,13 +64,13 @@ f = f / 255;
 %% Mean template of region-level information
 mask = fspecial('average', 7);
 f_local = imfilter(f_region_information, mask, 'symmetric');
-%% Calculate adaptive weights ¦Î_jz (denoted as xi in this file) in Eq. (15)
+%% Calculate adaptive weights Â¦ÃŽ_jz (denoted as xi in this file) in Eq. (15)
 [row, col, depth] = size(f);
 n = row * col;
 xi = zeros(row, col, depth);
 phi = (255 * (f_local - f_region_information)) .^ 2; % Eq. (13)
 phi_padded = padarray(phi, [1 1], 'symmetric');
-phi_std = stdfilt(phi, ones(3)) + eps; % ¦Ä_jz
+phi_std = stdfilt(phi, ones(3)) + eps; % Â¦Ã„_jz
 for i = -1 : 1
     for j = -1 : 1
         xi = xi + (exp(abs(phi_padded(i + 1 + 1 : end + i - 1, j + 1 + 1 : end + j - 1, :) - phi) ./ phi_std) - 1); % Eq. (14)
@@ -153,7 +153,7 @@ center = uint8(squeeze(center * 255));
 [~, cluster_indice] = max(U, [], 2);
 % To see how clear the membership partition.
 Vpc = sum(sum(U .^ 2)) / n * 100;
-Vpe = -sum(sum(U .* log(gather(U)))) / n * 100;
+Vpe = -sum(sum(U .* log(U))) / n * 100;
 fprintf('Fuzzy partition coefficient Vpc = %.2f%%\n', Vpc);
 fprintf('Fuzzy partition entropy Vpe = %.2f%%\n', Vpe);
 % Visualize all labels
