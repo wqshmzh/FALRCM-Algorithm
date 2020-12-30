@@ -31,14 +31,14 @@
 clear all;
 close all;
 %% Input image
-f_uint8 = imread('sy2.bmp'); % f_uint8 restores input image as uint8.
+f_uint8 = imread('test1.tif'); % f_uint8 restores input image as uint8.
 f = double(f_uint8);
 %% Parameters
-density = 0.2;
+density = 0.3;
 error = 0.1;
-cluster_num = 4;
+cluster_num = 2;
 max_iter = 200;
-gamma = 0.4;
+gamma = 0.15;
 k = 50;
 d = 5;
 % Parameters for region-level information
