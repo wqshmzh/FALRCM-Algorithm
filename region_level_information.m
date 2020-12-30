@@ -1,4 +1,4 @@
-function region_level = region_level_information(flag, f, l, S, g, sigma)
+function region_level = region_level_information(f, l, S, g, sigma)
 % Function for region-level information calculation
 % Inputs:
 % flag - GPU check. Flag = 1 if GPU is existed.
@@ -11,13 +11,8 @@ function region_level = region_level_information(flag, f, l, S, g, sigma)
 
 [m, n, depth] = size(f);
 f = double(f);
-mask = fspecial('gaussian', l, sigma);
-if flag
-    region_level = gpuArray(zeros(m, n, depth));
-    mask = gpuArray(mask);
-else
-    region_level = zeros(m, n, depth);
-end
+mask = fspecial('gaussian', [l l], sigma);
+region_level = zeros(m, n, depth);
 for i = 1 : depth
     half_side = floor(S / 2);
     whole_region = padarray(f(:, :, i), [half_side, half_side], 'symmetric');
