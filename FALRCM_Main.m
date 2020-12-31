@@ -89,7 +89,7 @@ f_region_information = repmat(reshape(f_region_information, n, 1, depth), [1 clu
 f_local = repmat(reshape(f_local, n, 1, depth), [1 cluster_num 1]);
 %% Initialization of clustering
 % Membership degrees
-U =rand(n, cluster_num);
+U = rand(n, cluster_num);
 % Eq. (22)
 alpha = 1 ./ difference;
 % Eq. (23)
