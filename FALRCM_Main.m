@@ -35,7 +35,7 @@ f_uint8 = imread('3063.jpg'); % f_uint8 restores input image as uint8.
 f = double(f_uint8);
 %% Parameters
 density = 0.15;
-error = 0.01;
+error = 0.1;
 cluster_num = 3;
 max_iter = 200;
 gamma = 0.15;
@@ -161,6 +161,5 @@ FCM_result = Label_image(f_uint8, reshape(cluster_indice, row, col));
 figure, imshow(FCM_result);
 title('Segmentation result');
 % Visualize objective function
-J=gather(J);
 figure,plot(J(1: iter));
 title('Objective function J');
