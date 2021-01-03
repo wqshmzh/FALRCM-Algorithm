@@ -2,7 +2,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fuzzy Image Clustering Incorporating Local and Region-level Information with Median Memberships
 % Applied Soft Computing Journal
-% This code was solely written by Qingsheng Wang at Lanzhou Jiaotong University, Lanzhou, China
+% This code was solely written by Qingsheng Wang.
 %
 % Detailed membership degrees in a randomly collected 5x5 local area can be seen in the following two matrices:
 % Cluster_1 - U_cluster1_local_5x5
