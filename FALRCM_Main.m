@@ -128,7 +128,7 @@ for iter = 1 : max_iter
     dist_b = mean(beta .* (xi .* (f_local - center_rep) .^ 2 + (1 - xi) .* (f_region_information - center_rep) .^ 2), 3);
     dist = dist_a + dist_b;
     % Update membership degrees by Eq. (31)
-    U_numerator = pi .* exp(-(pi .* gamma + dist) ./ gamma) + eps;
+    U_numerator = pi .* exp(-1 - dist ./ gamma) + eps;
     U = U_numerator ./ repmat(sum(U_numerator, 2), [1 cluster_num]);
     % Check local membership degrees
     U_reshape1 = reshape(U(:, 1), row, col);
