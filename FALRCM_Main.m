@@ -101,19 +101,25 @@ U_cluster1_local_5x5 = zeros(5, 5, max_iter); % cluster_1
 U_cluster2_local_5x5 = zeros(5, 5, max_iter); % cluster_2
 % Process U
 U_col_sum = sum(U, 2);
-U_col_sum = repmat(U_col_sum, [1 cluster_num]);
 U = U ./ U_col_sum;
+half_d = floor(d  / 2);
+pi = zeros(row, col, cluster_num);
+pi = padarray(pi, [half_d half_d], 'symmetric');
 %% Fuzzy clustering
 for iter = 1 : max_iter
     % Locally median membership degrees Eq. (18)
-    half_d = floor(d  / 2);
     U = reshape(U, row, col, cluster_num);
-    pi = padarray(zeros(row, col, cluster_num), [half_d half_d], 'symmetric');
     U = padarray(U, [half_d half_d], 'symmetric');
+    if (size(pi ,1) == row * col)
+        pi = reshape(pi, row, col, cluster_num);
+        pi = padarray(pi, [half_d half_d], 'symmetric');
+        pi = reshape(pi, size(pi, 1) * size(pi, 2), cluster_num);
+    end
+    pi = reshape(pi, row + half_d * 2, col + half_d * 2, cluster_num);
     for i = 1 : cluster_num
         % If medfilt2 function is called by GPU, edge padding method is not able to be specified by user. 
         % So I padded edges of U before this loop.
-        pi(:, :, i) = medfilt2(gather(U(:, :, i)), [d, d]);
+        pi(:, :, i) = medfilt2(U(:, :, i), [d, d]);
     end
     U = U(half_d + 1 : end - half_d, half_d + 1 : end - half_d, :);
     pi = pi(half_d + 1 : end - half_d, half_d + 1 : end - half_d, :);
