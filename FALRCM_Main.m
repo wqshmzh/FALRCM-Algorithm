@@ -31,12 +31,12 @@
 clear all;
 close all;
 %% Input image
-f_uint8 = imread('3063.jpg'); % f_uint8 restores input image as uint8.
+f_uint8 = imread('river_1.jpg'); % f_uint8 restores input image as uint8.
 f = double(f_uint8);
 %% Parameters
-density = 0.15;
+density = 0.2;
 error = 0.1;
-cluster_num = 3;
+cluster_num = 2;
 max_iter = 200;
 gamma = 0.15;
 k = 50;
@@ -64,13 +64,13 @@ f = f / 255;
 %% Mean template of region-level information
 mask = fspecial('average', 7);
 f_local = imfilter(f_region_information, mask, 'symmetric');
-%% Calculate adaptive weights ¦Î_jz (denoted as xi in this file) in Eq. (15)
+%% Calculate adaptive weights ξ_jz (denoted as xi in this file) in Eq. (15)
 [row, col, depth] = size(f);
 n = row * col;
 xi = zeros(row, col, depth);
 phi = (255 * (f_local - f_region_information)) .^ 2; % Eq. (13)
 phi_padded = padarray(phi, [1 1], 'symmetric');
-phi_std = stdfilt(phi, ones(3)) + eps; % ¦Ä_jz
+phi_std = stdfilt(phi, ones(3)) + eps; % δ_jz
 for i = -1 : 1
     for j = -1 : 1
         xi = xi + (exp(abs(phi_padded(i + 1 + 1 : end + i - 1, j + 1 + 1 : end + j - 1, :) - phi) ./ phi_std) - 1); % Eq. (14)
@@ -78,7 +78,7 @@ for i = -1 : 1
 end
 min_xi = min(min(min(xi)));
 max_xi = max(max(max(xi)));
-xi = (xi - min_xi) ./ (max_xi - min_xi); % Eq. (15)
+xi =(xi - min_xi)./(max_xi-min_xi); % Eq. (15)
 xi = repmat(reshape(xi, n, 1, depth), [1 cluster_num 1]);
 %% Calculate Eq. (21)
 difference = k * exp(stdfilt(f, ones(3)) - stdfilt(f_region_information, ones(3))) + eps;
@@ -89,7 +89,7 @@ f_region_information = repmat(reshape(f_region_information, n, 1, depth), [1 clu
 f_local = repmat(reshape(f_local, n, 1, depth), [1 cluster_num 1]);
 %% Initialization of clustering
 % Membership degrees
-U = rand(n, cluster_num);
+U =rand(n, cluster_num);
 % Eq. (22)
 alpha = 1 ./ difference;
 % Eq. (23)
@@ -101,28 +101,19 @@ U_cluster1_local_5x5 = zeros(5, 5, max_iter); % cluster_1
 U_cluster2_local_5x5 = zeros(5, 5, max_iter); % cluster_2
 % Process U
 U_col_sum = sum(U, 2);
+U_col_sum = repmat(U_col_sum, [1 cluster_num]);
 U = U ./ U_col_sum;
-half_d = floor(d  / 2);
-pi = zeros(row, col, cluster_num);
-pi = padarray(pi, [half_d half_d], 'symmetric');
 %% Fuzzy clustering
 for iter = 1 : max_iter
     % Locally median membership degrees Eq. (18)
+    half_d = floor(d  / 2);
     U = reshape(U, row, col, cluster_num);
-    U = padarray(U, [half_d half_d], 'symmetric');
-    if (size(pi ,1) == row * col)
-        pi = reshape(pi, row, col, cluster_num);
-        pi = padarray(pi, [half_d half_d], 'symmetric');
-        pi = reshape(pi, size(pi, 1) * size(pi, 2), cluster_num);
-    end
-    pi = reshape(pi, row + half_d * 2, col + half_d * 2, cluster_num);
+    pi = zeros(row, col, cluster_num);
     for i = 1 : cluster_num
         % If medfilt2 function is called by GPU, edge padding method is not able to be specified by user. 
         % So I padded edges of U before this loop.
-        pi(:, :, i) = medfilt2(U(:, :, i), [d, d]);
+        pi(:, :, i) = medfilt2(gather(U(:, :, i)), [d, d], 'symmetric');
     end
-    U = U(half_d + 1 : end - half_d, half_d + 1 : end - half_d, :);
-    pi = pi(half_d + 1 : end - half_d, half_d + 1 : end - half_d, :);
     U = reshape(U, row * col, cluster_num);
     pi = reshape(pi, row * col, cluster_num);
     % Update cluster centers by Eq. (32)
@@ -134,7 +125,7 @@ for iter = 1 : max_iter
     dist_b = mean(beta .* (xi .* (f_local - center_rep) .^ 2 + (1 - xi) .* (f_region_information - center_rep) .^ 2), 3);
     dist = dist_a + dist_b;
     % Update membership degrees by Eq. (31)
-    U_numerator = pi .* exp(-1 - dist ./ gamma) + eps;
+    U_numerator = pi .* exp(-(pi .* gamma + dist) ./ gamma) + eps;
     U = U_numerator ./ repmat(sum(U_numerator, 2), [1 cluster_num]);
     % Check local membership degrees
     U_reshape1 = reshape(U(:, 1), row, col);
@@ -159,7 +150,7 @@ center = uint8(squeeze(center * 255));
 [~, cluster_indice] = max(U, [], 2);
 % To see how clear the membership partition.
 Vpc = sum(sum(U .^ 2)) / n * 100;
-Vpe = -sum(sum(U .* log(U))) / n * 100;
+Vpe = -sum(sum(U .* log(gather(U)))) / n * 100;
 fprintf('Fuzzy partition coefficient Vpc = %.2f%%\n', Vpc);
 fprintf('Fuzzy partition entropy Vpe = %.2f%%\n', Vpe);
 % Visualize all labels
