@@ -110,8 +110,6 @@ for iter = 1 : max_iter
     U = reshape(U, row, col, cluster_num);
     pi = zeros(row, col, cluster_num);
     for i = 1 : cluster_num
-        % If medfilt2 function is called by GPU, edge padding method is not able to be specified by user. 
-        % So I padded edges of U before this loop.
         pi(:, :, i) = medfilt2(gather(U(:, :, i)), [d, d], 'symmetric');
     end
     U = reshape(U, row * col, cluster_num);
