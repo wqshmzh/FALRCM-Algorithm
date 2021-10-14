@@ -1,4 +1,3 @@
-%% BEST RUN WITH MATLAB R2018b!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fuzzy Image Clustering Incorporating Local and Region-level Information with Median Memberships
 % Applied Soft Computing Journal
