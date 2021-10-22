@@ -92,6 +92,7 @@ f_region_information = repmat(reshape(f_region_information, n, 1, depth), [1 clu
 f_local = repmat(reshape(f_local, n, 1, depth), [1 cluster_num 1]);
 %% Initialization of clustering
 % Membership degrees
+rng(1)
 U = gpuArray(rand(n, cluster_num));
 % Eq. (22)
 alpha = 1 ./ difference;
@@ -105,7 +106,7 @@ U_cluster2_local_5x5 = gpuArray(zeros(5, 5, max_iter)); % cluster_2
 % Process U
 U_col_sum = sum(U, 2);
 U = U ./ U_col_sum;
-half_d = floor(d  / 2);
+half_d = floor(d / 2);
 pi = gpuArray(zeros(row, col, cluster_num));
 pi = padarray(pi, [half_d half_d], 'symmetric');
 %% Fuzzy clustering
